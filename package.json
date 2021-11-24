@@ -1,0 +1,28 @@
+{
+  "name": "task_5_webdriverjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test/**.spec.js"
+  },
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axferox/Task_5_WebdriverJS.git"
+  },
+  "keywords": [],
+  "author": "axferox",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/axferox/Task_5_WebdriverJS/issues"
+  },
+  "homepage": "https://github.com/axferox/Task_5_WebdriverJS#readme",
+  "dependencies": {
+    "chromedriver": "^96.0.0",
+    "geckodriver": "^2.0.4",
+    "selenium-webdriver": "^4.1.0"
+  }
+}
