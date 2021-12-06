@@ -1,126 +1,139 @@
-const {
-    expect
-} = require("chai")
-const {
-    By,
-    Builder,
-    until,
-    elementLocated,
-    error
-} = require("selenium-webdriver");
+const PageFactory = require('../utils/page_factory');
+const { chromeConfig, sleep, quit } = require('../utils/webdriver/chrome_driver');
+const { expect } = require("chai")
+const TestData = require('../utils/test_data/test_data');
 
 describe('Test performs the testing of the login and sign up forms', () => {
-    let driver;
-    let testDataRandomizer = () => {
-        return Math.random().toString(36).replace(/[^a-z]/g, '').substr(0, 11);
-    };
-    let testNumbersRandomizer = () => {
-        return (Math.floor(Math.random() * (98765432120 - 100)) + 10000);
-    };
-
-    before(() => {
-        driver = new Builder().forBrowser('chrome').build();
-        driver.manage().window().maximize();
-
+    
+    before(async () => {
+        chromeConfig();
     })
     after(async () => {
-        await driver.sleep(9000);
-        await driver.quit();
-        driver = null;
+        sleep();
+        quit();
     })
+
     it('Should test that page is loaded and the title matches the expected', async () => {
-        await driver.get('https://www.ah.nl');
-        expect(await driver.getTitle()).to.equal('Albert Heijn: boodschappen doen bij de grootste supermarkt');
+        const homePageTitle = await PageFactory.getPage("Home")
+        await PageFactory.getPage("Home").open();
+        await PageFactory.getPage("Home").waitUntilTitleIsLoaded();
+        expect(await PageFactory.getPage("Home").getTitle()).equal(homePageTitle.expectedTitle);
     });
 
-    it('Should test that modal is opened and buttom contains the text ', async () => {
-        await driver.wait(until.elementLocated(By.id('cookie-popup'), 10000));
-        expect(await driver.findElement(By.id('accept-cookies')).getText()).to.equal('Accepteer')
+    it('Should test that cookie modal is opened and Accept button contains the text ', async () => {
+        const cookiePopup = await PageFactory.getPage("Cookie_Popup");
+        await PageFactory.getPage("Cookie_Popup").waitUntilElementIsLoaded(cookiePopup.cookiePopupModal);
+        expect(await PageFactory.getPage("Cookie_Popup").getElementText(cookiePopup.acceptButton)).equal(cookiePopup.acceptButton.locatorText);
     });
 
     it('Should test that modal is closed after submission', async () => {
-        await driver.findElement(By.id('accept-cookies')).click();
-        expect(() => driver.findElement(By.id('cookie-popup'))()).to.throw();
+        const cookiePopup = await PageFactory.getPage("Cookie_Popup");
+        await PageFactory.getPage("Cookie_Popup").elementClick(cookiePopup.acceptButton);
+        expect(() => PageFactory.getPage("Cookie_Popup").getElement(cookiePopup.cookiePopupModal)()).to.throw();
     });
 
-    it('Should test menu button name and user is landed on login screen after click', async () => {
-        expect(await driver.findElement(By.xpath('//*[@id="menu_personal"]/li[2]/a/span')).getText()).to.equal('Inloggen');
-        await driver.findElement(By.xpath('//*[@id="menu_personal"]/li[2]/a/span')).click();
-        expect(await driver.getCurrentUrl()).to.equal('https://www.ah.nl/mijn/inloggen?ref=%2F');
+    it('Should test that menu login button name matches the expected and can be clicked', async () => {
+        const HeaderNavigationMenu = await PageFactory.getPage("Home").Header.HeaderNavigation;
+        const menuLoginButton = HeaderNavigationMenu.menuLoginButton;
+        expect(await PageFactory.getPage("Home").getElementText(menuLoginButton)).equal(menuLoginButton.locatorText);
+        await PageFactory.getPage("Home").elementClick(menuLoginButton);
     });
 
-    it('Should test that page contains user sugn up link with text and  ', async () => {
-        expect(await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/div[2]/div[3]/div/footer/p[1]/a/span')).getText()).to.equal('Maak nu een profiel aan');
-        await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/div[2]/div[3]/div/footer/p[1]/a/span')).click();
+    it('Should test that user is landed on login screen after click', async () => {
+        const loginPage = await PageFactory.getPage("Log_in");
+        expect(await PageFactory.getPage("Log_in").getCurrentUrl()).equal(await loginPage.getPageUrl());
     });
 
+    it('Should test that page contains user sign up link with text present and user is landed on sing up page after click', async () => {
+        const loginPageLink = await PageFactory.getPage("Log_in").signInLink;
+        expect(await PageFactory.getPage("Log_in").getElementText(loginPageLink)).equal(loginPageLink.locatorText);
+
+        await PageFactory.getPage("Log_in").elementClick(loginPageLink)
+        const signupPage = await PageFactory.getPage("Sign_up");
+        expect(await PageFactory.getPage("Sign_up").getCurrentUrl()).equal(await signupPage.getPageUrl());
+    });
+
+    it('Should test that user is landed on sing up page after click', async () => {
+        const signupPage = await PageFactory.getPage("Sign_up");
+        expect(await PageFactory.getPage("Sign_up").getCurrentUrl()).equal(await signupPage.getPageUrl());
+    });
 
     it('Should test that radiobuttons is present and unticket by default', async () => {
-        expect(await driver.findElement(By.id('f-radio-button-gender-female')).isSelected()).equal(false);
-        expect(await driver.findElement(By.id('f-radio-button-gender-male')).isSelected()).equal(false);
+        const femaleButton = await PageFactory.getPage("Sign_up").femaleButton;
+        const maleButton = await PageFactory.getPage("Sign_up").maleButton;
 
-        await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/form/div[1]/span[1]/label')).click();
-        expect(await driver.findElement(By.id('f-radio-button-gender-female')).isSelected()).equal(true);
+        expect(await PageFactory.getPage("Sign_up").selected(femaleButton)).equal(false);
+        expect(await PageFactory.getPage("Sign_up").selected(maleButton)).equal(false);
 
-        await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/form/div[1]/span[2]/label')).click();
-        expect(await driver.findElement(By.id('f-radio-button-gender-male')).isSelected()).equal(true);
+        await PageFactory.getPage("Sign_up").elementClick(femaleButton.span);
+        expect(await PageFactory.getPage("Sign_up").selected(femaleButton)).equal(true);
+
+        await PageFactory.getPage("Sign_up").elementClick(maleButton.span);
+        expect(await PageFactory.getPage("Sign_up").selected(maleButton)).equal(true);
+
     });
 
 
     it('Should complete the fields with the test data', async () => {
+        const inputField = await PageFactory.getPage("Sign_up");
 
-        await driver.findElement(By.name('firstName')).sendKeys(testDataRandomizer());
-        await driver.findElement(By.name('lastName')).sendKeys(testDataRandomizer());
-        await driver.findElement(By.name('address.postalCodeNld')).sendKeys(`1421XM`);
-        await driver.findElement(By.name('address.houseNumber')).sendKeys(`1`);
-        await driver.findElement(By.name('address.houseNumberExtra')).sendKeys(`1`);
-        await driver.findElement(By.name('emailAddress')).sendKeys(`${testDataRandomizer()}@mailinator.com`);
-        await driver.findElement(By.name('password')).sendKeys(`${testDataRandomizer().toUpperCase()}${testNumbersRandomizer()}`);
-        await driver.findElement(By.css('#phoneNumber')).sendKeys(`06402190${testNumbersRandomizer()}`);
-        await driver.findElement(By.css('#dateOfBirthWebshop')).sendKeys(`11-11-2000`);
-
+        await PageFactory.getPage("Sign_up").input(inputField.firstName, TestData.textGenerator());
+        await PageFactory.getPage("Sign_up").input(inputField.lastName, TestData.textGenerator());
+        await PageFactory.getPage("Sign_up").input(inputField.postalCodeNld, TestData.postalCodeNld());
+        await PageFactory.getPage("Sign_up").input(inputField.houseNumber, TestData.houseNumber());
+        await PageFactory.getPage("Sign_up").input(inputField.houseNumberExtra, TestData.houseNumberExtra());
+        await PageFactory.getPage("Sign_up").input(inputField.emailAddress, TestData.mailRandomizer());
+        await PageFactory.getPage("Sign_up").input(inputField.password, TestData.passwordGenerator());
+        await PageFactory.getPage("Sign_up").input(inputField.phoneNumberNl, TestData.phoneNumberNl());
+        await PageFactory.getPage("Sign_up").input(inputField.birthDay, TestData.birthDay());
 
     });
 
     it('Should test that Bonus card options are unticked by default and can be ticked', async () => {
+        const optOut = await PageFactory.getPage("Sign_up").radioOptOut;
+        const request = await PageFactory.getPage("Sign_up").radioRequest;
+        const input = await PageFactory.getPage("Sign_up").radioInput;
 
-        expect(await driver.findElement(By.id('f-radio-button-bonusCardChoice-optOut')).isSelected()).equal(false);
-        expect(await driver.findElement(By.id('f-radio-button-bonusCardChoice-request')).isSelected()).equal(false);
-        expect(await driver.findElement(By.id('f-radio-button-bonusCardChoice-input')).isSelected()).equal(false);
+        expect(await PageFactory.getPage("Sign_up").selected(optOut)).equal(false);
+        expect(await PageFactory.getPage("Sign_up").selected(request)).equal(false);
+        expect(await PageFactory.getPage("Sign_up").selected(input)).equal(false);
 
+        await PageFactory.getPage("Sign_up").elementClick(optOut.span);
+        expect(await PageFactory.getPage("Sign_up").selected(optOut)).equal(true);
 
-        await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/form/div[7]/div[1]/div/span[3]/label')).click();
-        expect(await driver.findElement(By.id('f-radio-button-bonusCardChoice-optOut')).isSelected()).equal(true);
+        await PageFactory.getPage("Sign_up").elementClick(request.span);
+        expect(await PageFactory.getPage("Sign_up").selected(request)).equal(true);
 
-        await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/form/div[7]/div[1]/div/span[2]/label')).click();
-        expect(await driver.findElement(By.id('f-radio-button-bonusCardChoice-request')).isSelected()).equal(true);
-
-
-        await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/form/div[7]/div[1]/div/span[1]/label')).click();
-        expect(await driver.findElement(By.id('f-radio-button-bonusCardChoice-input')).isSelected()).equal(true);
+        await PageFactory.getPage("Sign_up").elementClick(input.span);
+        expect(await PageFactory.getPage("Sign_up").selected(input)).equal(true);
 
     });
 
 
     it('Should test that custom Bonus card field can be completed', async () => {
-        await driver.findElement(By.xpath('//*[@id="cards.BO"]')).sendKeys(`2620698240281`);
+        const inputField = await PageFactory.getPage("Sign_up").bonusCardNumberField;
+        await PageFactory.getPage("Sign_up").input(inputField, TestData.bonusCardNumber());
+
     });
 
 
     it('Should test that subscription checkboxes are unticked by defauilt and can be ticked', async () => {
+        const checkboxServiceMail = await PageFactory.getPage("Sign_up").checkboxServiceMail;
+        const checkboxMail = await PageFactory.getPage("Sign_up").checkboxMail;
 
-        expect(await driver.findElement(By.id('f-checkbox-serviceMail')).isSelected()).equal(false);
-        await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/form/div[8]/div/label')).click();
-        expect(await driver.findElement(By.id('f-checkbox-serviceMail')).isSelected()).equal(true);
+        expect(await PageFactory.getPage("Sign_up").selected(checkboxServiceMail)).equal(false);
+        await PageFactory.getPage("Sign_up").elementClick(checkboxServiceMail.span);
+        expect(await PageFactory.getPage("Sign_up").selected(checkboxServiceMail)).equal(true);
 
-        expect(await driver.findElement(By.id('f-checkbox-newsLetter')).isSelected()).equal(false)
-        await driver.findElement(By.xpath('//*[@id="app"]/div/main/div/div/div/form/div[9]/div/label')).click();
-        expect(await driver.findElement(By.id('f-checkbox-newsLetter')).isSelected()).equal(true)
+        expect(await PageFactory.getPage("Sign_up").selected(checkboxMail)).equal(false);
+        await PageFactory.getPage("Sign_up").elementClick(checkboxMail.span);
+        expect(await PageFactory.getPage("Sign_up").selected(checkboxMail)).equal(true);
 
     });
 
     it('Should test that can be submitted', async () => {
-        await driver.findElement(By.id('registration-form-submit')).click();
+        const submitButton = await PageFactory.getPage("Sign_up").registrationSubmitButton;
+        await await PageFactory.getPage("Sign_up").elementClick(submitButton);
     });
 
 });
