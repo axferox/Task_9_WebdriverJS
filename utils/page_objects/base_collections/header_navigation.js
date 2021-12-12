@@ -1,13 +1,11 @@
 class HeaderNavigationMenu {
     constructor() {
-
         this.menuLoginButton = {
-            locatorType: 'xpath',
+            locatorType: "xpath",
             locatorId: '//*[@id="menu_personal"]/li[2]/a/span',
-            locatorText: 'Inloggen'
+            locatorText: "Inloggen",
         };
+    }
+}
 
-    };
-};
-
-module.exports = HeaderNavigationMenu;
+module.exports = { HeaderNavigationMenu };

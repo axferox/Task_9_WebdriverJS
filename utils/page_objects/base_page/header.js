@@ -1,10 +1,9 @@
-const HeaderNavigation = require("../base_collections/header_navigation");
+const { HeaderNavigationMenu } = require("../base_collections/header_navigation");
 
 class Header {
-
     constructor() {
-        this.HeaderNavigation = new HeaderNavigation()
+        this.HeaderNavigation = new HeaderNavigationMenu();
     }
 }
 
-module.exports = Header;
+module.exports = { Header };
