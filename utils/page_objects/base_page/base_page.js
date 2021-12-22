@@ -1,74 +1,85 @@
 const { Builder, wait, until, By } = require("selenium-webdriver");
-const { driver } = require("../../webdriver/chrome_driver");
+const { driver } = require("../../driver/chrome_driver");
 const { Header } = require("./header");
 
 class BasePage {
-    constructor() {
-        this.baseUrl = `https://www.ah.nl`;
-        this.Header = new Header();
-    }
+  constructor() {
+    this.baseUrl = `https://www.ah.nl`;
+    this.Header = new Header();
+  }
 
-    getPageUrl() {
-        return `${this.baseUrl}${this.path}`;
-    }
+  getPageUrl() {
+    return `${this.baseUrl}${this.path}`;
+  }
 
-    open() {
-        return driver.get(`${this.baseUrl}${this.path}`);
-    }
+  open() {
+    return driver.get(`${this.baseUrl}${this.path}`);
+  }
 
-    getTitle() {
-        return driver.getTitle();
-    }
+  sleep(milliseconds) {
+    return driver.sleep(milliseconds);
+  }
 
-    getCurrentUrl() {
-        return driver.getCurrentUrl();
-    }
+  getTitle() {
+    return driver.getTitle();
+  }
 
-    input(element, inputData) {
-        return this.getElement(element).sendKeys(inputData);
-    }
+  getCurrentUrl() {
+    return driver.getCurrentUrl();
+  }
 
-    selected(element) {
-        return this.getElement(element).isSelected();
-    }
+  input(element, inputData) {
+    return this.getElement(element).sendKeys(inputData);
+  }
 
-    waitUntilTitleIsLoaded() {
-        return driver.wait(until.titleIs(this.expectedTitle));
-    }
+  selected(element) {
+    return this.getElement(element).isSelected();
+  }
 
-    getElementText(element) {
-        return this.getElement(element).getText();
-    }
+  waitUntilTitleIsLoaded() {
+    return driver.wait(until.titleIs(this.expectedTitle));
+  }
 
-    elementClick(element) {
-        return this.getElement(element).click();
-    }
+  getElementText(element) {
+    return this.getElement(element).getText();
+  }
 
-    waitUntilElementIsLoaded(element, waitMilliseconds = 10000) {
-        if (element.locatorType === "xpath") {
-            return driver.wait(until.elementLocated(By.xpath(element.locatorId), waitMilliseconds));
-        } else if (element.locatorType === "id") {
-            return driver.wait(until.elementLocated(By.id(element.locatorId)), waitMilliseconds);
-        } else if (element.locatorType === "css") {
-            return driver.wait(until.elementLocated(By.css(element.locatorId)), waitMilliseconds);
-        } else {
-            throw Error(`Element Locator: ${element.locatorType} or Id: ${element.locatorId} is not defined`);
-        }
-    }
+  elementClick(element) {
+    return this.getElement(element).click();
+  }
 
-    getElement(element) {
-        if (element.locatorType === "xpath") {
-            return driver.findElement(By.xpath(element.locatorId));
-        } else if (element.locatorType === "id") {
-            return driver.findElement(By.id(element.locatorId));
-        } else if (element.locatorType === "css") {
-            return driver.findElement(By.css(element.locatorId));
-        } else if (element.locatorType === "name") {
-            return driver.findElement(By.name(element.locatorId));
-        } else {
-            throw Error(`Element Locator: ${element.locatorType} or Id: ${element.locatorId} is not defined`);
-        }
+  elementClickAction(element) {
+    return driver.actions().click(this.getElement(element)).perform();
+  }
+
+  elementHoverAction(element) {
+    return driver
+      .actions()
+      .move({ duration: 5000, origin: this.getElement(element) })
+      .perform();
+  }
+
+  elementFindAndClickJavaScript(element) {
+    return driver.executeScript(`document.querySelector("${element}").click()`);
+  }
+
+  waitUntilElementIsVisible(element, waitMilliseconds = 10000) {
+    return driver.wait(until.elementIsVisible(this.getElement(element), waitMilliseconds));
+  }
+
+  getElement(element) {
+    if (element.locatorType === "xpath") {
+      return driver.findElement(By.xpath(element.locatorId));
+    } else if (element.locatorType === "id") {
+      return driver.findElement(By.id(element.locatorId));
+    } else if (element.locatorType === "css") {
+      return driver.findElement(By.css(element.locatorId));
+    } else if (element.locatorType === "name") {
+      return driver.findElement(By.name(element.locatorId));
+    } else {
+      throw Error(`Element Locator: ${element.locatorType} or Id: ${element.locatorId} is not defined`);
     }
+  }
 }
 
 module.exports = { BasePage };

@@ -1,0 +1,1 @@
+java -jar selenium-server-4.1.1.jar node --port 5628 --config node_config_firefox.toml 
