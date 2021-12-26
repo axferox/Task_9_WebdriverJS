@@ -9,7 +9,6 @@ describe("Test performs the testing of the login and sign up forms", () => {
     await browserConfig();
   });
   after(async () => {
-    await sleep();
     await quit();
   });
 

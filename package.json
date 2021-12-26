@@ -6,7 +6,7 @@
     "test": "test/specs/**.spec.js"
   },
   "scripts": {
-    "test": "mocha 'test/specs/**.spec.js' --timeout 100000",
+    "test": "mocha 'test/specs/**.spec.js' --timeout 10000",
     "remove-logs": "node test/utils/cleanup/log_cleanup.js",
     "pretest": "npm run remove-logs"
   },
