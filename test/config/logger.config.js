@@ -1,6 +1,6 @@
 const winston = require("winston");
-const { createLogger, format, transports } = require("winston");
-const { combine, timestamp, label, prettyPrint, simple, logstash, json, printf } = format;
+const { format, transports } = require("winston");
+const { combine, simple} = format;
 
 const logger = winston.createLogger({
   level: "info",
