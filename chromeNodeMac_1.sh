@@ -1,0 +1,1 @@
+java -jar test/grid/selenium-server-4.1.1.jar node --port 5629 --config test/grid/nodeconfigChromeParallel.toml

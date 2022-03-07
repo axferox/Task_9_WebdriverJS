@@ -5,24 +5,31 @@
 
 # Installation:
 
-1. Update your chrome and gecko drivers for Selenium Grid according to your operating system in this folder: 'test/grid'. 
+1. Update your chrome and gecko drivers for Selenium Grid according to your operating system in this folder: 'test/grid/selenium'. 
 By default it's used the web drivers for launch on a MacOS
 
 2. Launch the Grid Hub via executing the bash script
 ```
-bash hub_launch.sh
+bash hubLaunch.sh
 ```
-2. Then you'll need to launch the Firefox agent node or Chrome agent node via scripts from 'test/grid'
+2. Then you'll need to launch the Firefox agent node or Chrome agent node via scripts from the project root folder
+If you would like to run tests in parallel - launch:
+Mac:
 ```
-bash chrome_node_1.sh
+bash chromeNodeMac_1.sh
 ```
-OR
+Windows:
 ```
-bash chrome_node_1.sh
+bash chromeNodeWin_1.sh
 ```
-OR
+OR if you would like to run tests sequentally - launch:
+Mac:
 ```
-bash firefox_node_1.sh
+bash chromeNodeMac_2.sh
+```
+Windows:
+```
+bash chromeNodeWin_2.sh
 ```
 3. Then you'll need to install the npm 
 ```

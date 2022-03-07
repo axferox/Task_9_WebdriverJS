@@ -1,0 +1,1 @@
+java -jar test/grid/selenium-server-4.1.1.jar node --port 5632 --config test/grid/nodeConfigChromeWinSequental.toml
