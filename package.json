@@ -6,7 +6,9 @@
     "test": "test/**.spec.js"
   },
   "scripts": {
-    "test": "mocha 'test/specs/**.spec.js' --timeout 10000000 --parallel true"
+    "test": "mocha 'test/specs/**.spec.js' --timeout 10000000 --parallel true",
+    "remove-logs": "node ./test/utils/cleanup/logCleanup.js",
+    "pretest": "npm run remove-logs"
   },
   "repository": {
     "type": "git",
